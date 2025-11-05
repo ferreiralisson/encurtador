@@ -1,4 +1,8 @@
-<div class="container">
+<div class="full-loading" *ngIf="initialLoading">
+    <mat-spinner diameter="60"></mat-spinner>
+</div>
+
+<div class="container" *ngIf="!initialLoading">
     <h2>Encurtador de URL</h2>
 
     <input 
@@ -18,3 +22,13 @@
         {{ errorMessage }}
     </p>
 </div>
+
+<!-- Binding
+- [()] <- two way data Binding html <==> ts
+- [] <- property Binding: ts => html
+- () <- event Binding: html => ts
+
+Diretivas angular
+*ngIf
+ngHideen
+*ngFor -->

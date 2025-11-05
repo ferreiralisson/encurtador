@@ -1,21 +1,34 @@
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar'
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { UrlShortenerService } from '../services/url-shortener.service';
 
 @Component({
   selector: 'app-url-shortener',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, MatProgressSpinnerModule],
   templateUrl: './url-shortener.component.html',
   styleUrl: './url-shortener.component.css'
 })
-export class UrlShortenerComponent {
+export class UrlShortenerComponent implements OnInit {
   urlInput: string = '';
   shortUrl: string | null = null;
   errorMessage: string | null = null;
+  initialLoading = true;
+  loading = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private snackBar: MatSnackBar,
+    private shortenerService: UrlShortenerService
+  ) {}
+
+  ngOnInit(): void {
+    setTimeout(() => {
+      this.initialLoading = false;
+    }, 2000);
+  }
 
   shortenUrl(){
     this.shortUrl = null;
@@ -23,17 +36,23 @@ export class UrlShortenerComponent {
 
     const url = this.urlInput.trim();
     if(!url) {
-      this.errorMessage = 'Por favor, insira uma URL válida';
+      this.snackBar.open('Por favor, insira uma URL válida.', 'Fechar', {duration: 3000});
       return;
     }
 
-    this.http.post('http://localhost:8080/shorten', url, { responseType: 'text'})
+    this.loading = true;
+
+    this.shortenerService.shortenUrl(url)
     .subscribe({
       next: (response) => {
         this.shortUrl = response;
+        this.snackBar.open('URL encurtada com sucesso!', 'OK', { duration: 3000});
       },
       error: () => {
-        this.errorMessage = 'Erro ao encurtar a URL';
+        this.snackBar.open('Erro ao encurtar a URL', 'Fechar', { duration: 3000});
+      },
+      complete: () => {
+        this.loading = false;
       }
     })
   }

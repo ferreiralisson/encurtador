@@ -18,7 +18,7 @@ public class UrlShortenerController {
     @PostMapping
     public ResponseEntity<String> shortenUrl(@RequestBody String originalUrl){
         var code = urlShortenerService.shortenUrl(originalUrl);
-        return ResponseEntity.ok("http://localhost:8080/shorten/"+code);
+        return ResponseEntity.ok("http://localhost:8081/shorten/"+code);
     }
 
     @GetMapping("/{code}")
